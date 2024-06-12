@@ -1,0 +1,10 @@
+cmake-build-debug/
+.idea/
+compile/
+build/
+.vs/
+*.pdb
+*.manifest
+*.ilk
+executable
+out/

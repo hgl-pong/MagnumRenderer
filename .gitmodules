@@ -1,0 +1,3 @@
+[submodule "HMath"]
+	path = HMath
+	url = https://github.com/hgl-pong/HMath.git
