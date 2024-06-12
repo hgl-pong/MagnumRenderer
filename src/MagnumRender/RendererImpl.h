@@ -33,6 +33,7 @@
 #include <Math/GraphicUtils/Frustum.h>
 #include <Math/GraphicUtils/CameraManager.h>
 #include <Math/GraphicUtils/FrameProfiler.h>
+#include <MagnumRender/RenderUnit.h>
 #include <unordered_set>
 namespace MagnumRender
 {
@@ -50,6 +51,12 @@ namespace MagnumRender
 			const KeyBoardPressCallback& keyboardPressCallback,
 			const KeyBoardReleaseCallback& keyBoardCallback)override;
 		void Release() override {
+			for(auto& renderObject : m_RenderObjects)
+			{
+				renderObject->RemoveFromScene();
+			}
+			m_RenderObjects.clear();
+			m_ShaderTable.UnInit();
 			delete this;
 		}
 		int Tick() override {

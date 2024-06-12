@@ -33,9 +33,9 @@ public:
 	}
 	int Run()
 	{
-		while (true)
+		while (m_Renderer->Tick())
 		{
-			m_Renderer->Tick();
+			
 		}
 		return 1;
 	}

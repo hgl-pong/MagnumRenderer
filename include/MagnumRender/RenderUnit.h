@@ -51,35 +51,59 @@ namespace MagnumRender
 		{
 			if (m_bIsInitialized)
 				return;
-			m_FlatShader = Magnum::Shaders::Flat3D{};
-			m_PhongShader = Magnum::Shaders::Phong{};
-			m_VertexColorShader = Magnum::Shaders::VertexColor3D{};
+			m_FlatShader = new Magnum::Shaders::Flat3D{};
+			m_PhongShader = new Magnum::Shaders::Phong{};
+			m_VertexColorShader = new Magnum::Shaders::VertexColor3D{};
 			m_bIsInitialized = true;
+		}
+
+		void UnInit()
+		{
+			if (!m_bIsInitialized)
+				return;
+			if (m_FlatShader)
+			{
+				delete m_FlatShader;
+				m_FlatShader = nullptr;
+			}
+
+			if (m_PhongShader)
+			{
+				delete m_PhongShader;
+				m_PhongShader = nullptr;
+			}
+
+			if (m_VertexColorShader)
+			{
+				delete m_VertexColorShader;
+				m_VertexColorShader = nullptr;
+			}
+			m_bIsInitialized = false;
 		}
 
 		Magnum::Shaders::Flat3D &GetFlatShader()
 		{
 			Init();
-			return m_FlatShader;
+			return *m_FlatShader;
 		}
 
 		Magnum::Shaders::Phong &GetPhongShader()
 		{
 			Init();
-			return m_PhongShader;
+			return *m_PhongShader;
 		}
 
 		Magnum::Shaders::VertexColor3D &GetVertexColorShader()
 		{
 			Init();
-			return m_VertexColorShader;
+			return *m_VertexColorShader;
 		}
 
 	private:
 		bool m_bIsInitialized = false;
-		Magnum::Shaders::Flat3D m_FlatShader{Magnum::NoCreate};
-		Magnum::Shaders::Phong m_PhongShader{Magnum::NoCreate};
-		Magnum::Shaders::VertexColor3D m_VertexColorShader{Magnum::NoCreate};
+		Magnum::Shaders::Flat3D *m_FlatShader = nullptr;
+		Magnum::Shaders::Phong *m_PhongShader = nullptr;
+		Magnum::Shaders::VertexColor3D *m_VertexColorShader = nullptr;
 	};
 
 	static ShaderTable m_ShaderTable;
@@ -155,7 +179,7 @@ namespace MagnumRender
 	class GizmoRenderUnit : public RenderUnitBase
 	{
 	public:
-		explicit GizmoRenderUnit(const MathLib::GraphicUtils::MeshData& meshData)
+		explicit GizmoRenderUnit(const MathLib::GraphicUtils::MeshData &meshData)
 			: RenderUnitBase(meshData)
 		{
 			m_Mesh.setPrimitive(Magnum::MeshPrimitive::Lines);
@@ -190,7 +214,7 @@ namespace MagnumRender
 			MathLib::GraphicUtils::MeshData wireframeMeshData;
 			wireframeMeshData.m_Vertices = meshData.m_Vertices;
 			wireframeMeshData.m_Indices = MathLib::GraphicUtils::TrianglesToLines(meshData.m_Indices);
-			m_WireFrameMesh= Magnum::MeshTools::compile(CreateMesh(wireframeMeshData));
+			m_WireFrameMesh = Magnum::MeshTools::compile(CreateMesh(wireframeMeshData));
 			m_WireFrameMesh.setPrimitive(Magnum::MeshPrimitive::Lines);
 			m_Mesh.setPrimitive(Magnum::MeshPrimitive::Triangles);
 		}
@@ -203,7 +227,7 @@ namespace MagnumRender
 
 			m_ShaderTable.GetPhongShader().setLightPosition(ToMagnum(mLightPosition)).setAmbientColor(m_AmbientColor).setDiffuseColor(m_DiffuseColor).setLightColor(mLightColor).setTransformationMatrix(transformationMatrix).setNormalMatrix(transformationMatrix.normalMatrix()).setProjectionMatrix(ToMagnum(camera.GetProjectMatrix()));
 			m_ShaderTable.GetPhongShader().draw(m_Mesh);
-			if (m_bShowWireframe)	
+			if (m_bShowWireframe)
 			{
 				m_ShaderTable.GetFlatShader().setColor(0x000000_rgbf).setTransformationProjectionMatrix(ToMagnum(camera.GetProjectMatrix()) * transformationMatrix).draw(m_WireFrameMesh);
 			}
@@ -249,6 +273,7 @@ namespace MagnumRender
 			Magnum::Vector3 position;
 			Magnum::Color3 color;
 		};
+
 	public:
 		explicit CoordinateAxis(const MathLib::HReal length = 60.f)
 			: RenderUnitBase(MathLib::GraphicUtils::GenerateBoxMeshData(MathLib::HVector3(1, 1, 1)))
@@ -256,12 +281,12 @@ namespace MagnumRender
 			std::vector<Vertex> vertices;
 			std::vector<unsigned int> indices;
 
-			// XÖá (ºìÉ«)
-			_AddArrow(vertices, indices, { 0.0f, 0.0f, 0.0f }, { length, 0.0f, 0.0f }, 0xff0000_rgbf, 0.1f);
-			// YÖá (ÂÌÉ«)
-			_AddArrow(vertices, indices, { 0.0f, 0.0f, 0.0f }, { 0.0f, length, 0.0f }, 0x00ff00_rgbf, 0.1f);
-			// ZÖá (À¶É«)
-			_AddArrow(vertices, indices, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, length }, 0x0000ff_rgbf, 0.1f);
+			// Xï¿½ï¿½ (ï¿½ï¿½É«)
+			_AddArrow(vertices, indices, {0.0f, 0.0f, 0.0f}, {length, 0.0f, 0.0f}, 0xff0000_rgbf, 0.1f);
+			// Yï¿½ï¿½ (ï¿½ï¿½É«)
+			_AddArrow(vertices, indices, {0.0f, 0.0f, 0.0f}, {0.0f, length, 0.0f}, 0x00ff00_rgbf, 0.1f);
+			// Zï¿½ï¿½ (ï¿½ï¿½É«)
+			_AddArrow(vertices, indices, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, length}, 0x0000ff_rgbf, 0.1f);
 
 			m_VertexBuffer.setData(vertices);
 			m_IndexBuffer.setData(indices);
@@ -275,49 +300,55 @@ namespace MagnumRender
 
 		void Render(MathLib::GraphicUtils::Camera &camera) override
 		{
-			if (m_bShow) {
+			if (m_bShow)
+			{
 				Magnum::Matrix4 viewProjectionMatrix = ToMagnum(camera.GetViewProjectMatrix());
-				Magnum::Matrix4 screenTransform = Magnum::Matrix4::translation({ -0.9f, -0.9f, 0.0f }) *
-					Magnum::Matrix4::scaling({ 0.1f, 0.1f, 0.1f });
+				Magnum::Matrix4 screenTransform = Magnum::Matrix4::translation({-0.9f, -0.9f, 0.0f}) *
+												  Magnum::Matrix4::scaling({0.1f, 0.1f, 0.1f});
 
 				m_ShaderTable.GetVertexColorShader().setTransformationProjectionMatrix(viewProjectionMatrix * m_TransformationMatrix);
 				m_ShaderTable.GetVertexColorShader().draw(m_Mesh);
 			}
 		}
+
 	private:
-		void _AddArrow(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-			const Magnum::Vector3& start, const Magnum::Vector3& end, const Magnum::Color3& color,const MathLib::HReal radius =1.f) {
-			// Ìí¼ÓÔ²ÖùÌå²¿·Ö
+		void _AddArrow(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices,
+					   const Magnum::Vector3 &start, const Magnum::Vector3 &end, const Magnum::Color3 &color, const MathLib::HReal radius = 1.f)
+		{
+			// ï¿½ï¿½ï¿½ï¿½Ô²ï¿½ï¿½ï¿½å²¿ï¿½ï¿½
 			unsigned int startIndex = vertices.size();
 			_AddCylinder(vertices, indices, start, end - (end - start).normalized(), color, radius);
 
-			// ¼ÆËã¼ýÍ·µ×²¿µÄÖÐÐÄÎ»ÖÃ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 			Magnum::Vector3 direction = (end - start).normalized();
 			Magnum::Vector3 arrowBase = end - direction;
 
-			// Ìí¼ÓÔ²×¶Ìå²¿·Ö
-			_AddCone(vertices, indices, arrowBase, end, color, radius*5);
+			// ï¿½ï¿½ï¿½ï¿½Ô²×¶ï¿½å²¿ï¿½ï¿½
+			_AddCone(vertices, indices, arrowBase, end, color, radius * 5);
 		}
 
-		void _AddCylinder(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-			const Magnum::Vector3& start, const Magnum::Vector3& end, const Magnum::Color3& color, float radius) {
+		void _AddCylinder(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices,
+						  const Magnum::Vector3 &start, const Magnum::Vector3 &end, const Magnum::Color3 &color, float radius)
+		{
 			const int numSegments = 10;
 			unsigned int baseIndex = vertices.size();
 
 			Magnum::Vector3 direction = (end - start).normalized();
-			Magnum::Vector3 up = direction.z() != 0.0f ? Magnum::Vector3{ 1.0f, 0.0f, 0.0f } : Magnum::Vector3{ 0.0f, 0.0f, 1.0f };
+			Magnum::Vector3 up = direction.z() != 0.0f ? Magnum::Vector3{1.0f, 0.0f, 0.0f} : Magnum::Vector3{0.0f, 0.0f, 1.0f};
 			Magnum::Vector3 right = Magnum::Math::cross(direction, up).normalized();
 			up = Magnum::Math::cross(right, direction).normalized();
 
-			for (int i = 0; i < numSegments; ++i) {
+			for (int i = 0; i < numSegments; ++i)
+			{
 				float angle = 2.0f * Magnum::Math::Constants<float>::pi() * i / numSegments;
 				float x = std::cos(angle) * radius;
 				float y = std::sin(angle) * radius;
-				vertices.push_back({ start + right * x + up * y, color });
-				vertices.push_back({ end + right * x + up * y, color });
+				vertices.push_back({start + right * x + up * y, color});
+				vertices.push_back({end + right * x + up * y, color});
 			}
 
-			for (int i = 0; i < numSegments; ++i) {
+			for (int i = 0; i < numSegments; ++i)
+			{
 				int next = (i + 1) % numSegments;
 				indices.push_back(baseIndex + i * 2);
 				indices.push_back(baseIndex + next * 2);
@@ -329,42 +360,47 @@ namespace MagnumRender
 			}
 		}
 
-		void _AddCone(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-			const Magnum::Vector3& base, const Magnum::Vector3& tip, const Magnum::Color3& color, float radius) {
+		void _AddCone(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices,
+					  const Magnum::Vector3 &base, const Magnum::Vector3 &tip, const Magnum::Color3 &color, float radius)
+		{
 			const int numSegments = 10;
 			unsigned int baseIndex = vertices.size();
 
 			Magnum::Vector3 direction = (tip - base).normalized();
-			Magnum::Vector3 up = direction.z() != 0.0f ? Magnum::Vector3{ 1.0f, 0.0f, 0.0f } : Magnum::Vector3{ 0.0f, 0.0f, 1.0f };
+			Magnum::Vector3 up = direction.z() != 0.0f ? Magnum::Vector3{1.0f, 0.0f, 0.0f} : Magnum::Vector3{0.0f, 0.0f, 1.0f};
 			Magnum::Vector3 right = Magnum::Math::cross(direction, up).normalized();
 			up = Magnum::Math::cross(right, direction).normalized();
 
-			// Éú³ÉÔ²×¶µ×²¿¶¥µã
-			for (int i = 0; i < numSegments; ++i) {
+			// ï¿½ï¿½ï¿½ï¿½Ô²×¶ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½
+			for (int i = 0; i < numSegments; ++i)
+			{
 				float angle = 2.0f * Magnum::Math::Constants<float>::pi() * i / numSegments;
 				float x = std::cos(angle) * radius;
 				float y = std::sin(angle) * radius;
-				vertices.push_back({ base + right * x + up * y, color });
+				vertices.push_back({base + right * x + up * y, color});
 			}
-			vertices.push_back({ tip, color }); // ¼ýÍ·¼â¶Ë
+			vertices.push_back({tip, color}); // ï¿½ï¿½Í·ï¿½ï¿½ï¿½
 			unsigned int tipIndex = vertices.size() - 1;
 
-			// Éú³ÉÔ²×¶²àÃæË÷Òý
-			for (int i = 0; i < numSegments; ++i) {
+			// ï¿½ï¿½ï¿½ï¿½Ô²×¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			for (int i = 0; i < numSegments; ++i)
+			{
 				indices.push_back(baseIndex + i);
 				indices.push_back(baseIndex + (i + 1) % numSegments);
 				indices.push_back(tipIndex);
 			}
 
-			// Éú³ÉÔ²×¶µ×²¿Ë÷Òý
+			// ï¿½ï¿½ï¿½ï¿½Ô²×¶ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½
 			unsigned int centerIndex = vertices.size();
-			vertices.push_back({ base, color });
-			for (int i = 0; i < numSegments; ++i) {
+			vertices.push_back({base, color});
+			for (int i = 0; i < numSegments; ++i)
+			{
 				indices.push_back(centerIndex);
 				indices.push_back(baseIndex + i);
 				indices.push_back(baseIndex + (i + 1) % numSegments);
 			}
 		}
+
 	private:
 		Magnum::GL::Buffer m_VertexBuffer;
 		Magnum::GL::Buffer m_IndexBuffer;
