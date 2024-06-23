@@ -111,7 +111,7 @@ namespace MagnumRender
 	class RenderUnitBase
 	{
 	public:
-		explicit RenderUnitBase(const MathLib::GraphicUtils::MeshData &meshData)
+		explicit RenderUnitBase(const MathLib::GraphicUtils::MeshData32 &meshData)
 		{
 			m_Mesh = Magnum::MeshTools::compile(CreateMesh(meshData));
 		}
@@ -134,7 +134,7 @@ namespace MagnumRender
 		{
 			m_bShow = show;
 		}
-		virtual void SetMeshData(const MathLib::GraphicUtils::MeshData &meshdata) { m_Mesh = Magnum::MeshTools::compile(CreateMesh(meshdata)); }
+		virtual void SetMeshData(const MathLib::GraphicUtils::MeshData32&meshdata) { m_Mesh = Magnum::MeshTools::compile(CreateMesh(meshdata)); }
 		virtual void AddToScene(Object3D &scene)
 		{
 			m_Object.setParent(&scene);
@@ -179,7 +179,7 @@ namespace MagnumRender
 	class GizmoRenderUnit : public RenderUnitBase
 	{
 	public:
-		explicit GizmoRenderUnit(const MathLib::GraphicUtils::MeshData &meshData)
+		explicit GizmoRenderUnit(const MathLib::GraphicUtils::MeshData32&meshData)
 			: RenderUnitBase(meshData)
 		{
 			m_Mesh.setPrimitive(Magnum::MeshPrimitive::Lines);
@@ -208,10 +208,10 @@ namespace MagnumRender
 	class SimpleRenderUnit : public RenderUnitBase
 	{
 	public:
-		explicit SimpleRenderUnit(const MathLib::GraphicUtils::MeshData &meshData)
+		explicit SimpleRenderUnit(const MathLib::GraphicUtils::MeshData32&meshData)
 			: RenderUnitBase(meshData)
 		{
-			MathLib::GraphicUtils::MeshData wireframeMeshData;
+			MathLib::GraphicUtils::MeshData32 wireframeMeshData;
 			wireframeMeshData.m_Vertices = meshData.m_Vertices;
 			wireframeMeshData.m_Indices = MathLib::GraphicUtils::TrianglesToLines(meshData.m_Indices);
 			m_WireFrameMesh = Magnum::MeshTools::compile(CreateMesh(wireframeMeshData));
@@ -276,16 +276,13 @@ namespace MagnumRender
 
 	public:
 		explicit CoordinateAxis(const MathLib::HReal length = 60.f)
-			: RenderUnitBase(MathLib::GraphicUtils::GenerateBoxMeshData(MathLib::HVector3(1, 1, 1)))
+			: RenderUnitBase(MathLib::GraphicUtils::GenerateBoxMeshData<uint32_t>(MathLib::HVector3(1, 1, 1)))
 		{
 			std::vector<Vertex> vertices;
 			std::vector<unsigned int> indices;
 
-			// X�� (��ɫ)
 			_AddArrow(vertices, indices, {0.0f, 0.0f, 0.0f}, {length, 0.0f, 0.0f}, 0xff0000_rgbf, 0.1f);
-			// Y�� (��ɫ)
 			_AddArrow(vertices, indices, {0.0f, 0.0f, 0.0f}, {0.0f, length, 0.0f}, 0x00ff00_rgbf, 0.1f);
-			// Z�� (��ɫ)
 			_AddArrow(vertices, indices, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, length}, 0x0000ff_rgbf, 0.1f);
 
 			m_VertexBuffer.setData(vertices);
@@ -315,15 +312,12 @@ namespace MagnumRender
 		void _AddArrow(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices,
 					   const Magnum::Vector3 &start, const Magnum::Vector3 &end, const Magnum::Color3 &color, const MathLib::HReal radius = 1.f)
 		{
-			// ����Բ���岿��
 			unsigned int startIndex = vertices.size();
 			_AddCylinder(vertices, indices, start, end - (end - start).normalized(), color, radius);
 
-			// �����ͷ�ײ�������λ��
 			Magnum::Vector3 direction = (end - start).normalized();
 			Magnum::Vector3 arrowBase = end - direction;
 
-			// ����Բ׶�岿��
 			_AddCone(vertices, indices, arrowBase, end, color, radius * 5);
 		}
 
@@ -371,7 +365,6 @@ namespace MagnumRender
 			Magnum::Vector3 right = Magnum::Math::cross(direction, up).normalized();
 			up = Magnum::Math::cross(right, direction).normalized();
 
-			// ����Բ׶�ײ�����
 			for (int i = 0; i < numSegments; ++i)
 			{
 				float angle = 2.0f * Magnum::Math::Constants<float>::pi() * i / numSegments;
@@ -379,10 +372,9 @@ namespace MagnumRender
 				float y = std::sin(angle) * radius;
 				vertices.push_back({base + right * x + up * y, color});
 			}
-			vertices.push_back({tip, color}); // ��ͷ���
+			vertices.push_back({tip, color}); 
 			unsigned int tipIndex = vertices.size() - 1;
 
-			// ����Բ׶��������
 			for (int i = 0; i < numSegments; ++i)
 			{
 				indices.push_back(baseIndex + i);
@@ -390,7 +382,6 @@ namespace MagnumRender
 				indices.push_back(tipIndex);
 			}
 
-			// ����Բ׶�ײ�����
 			unsigned int centerIndex = vertices.size();
 			vertices.push_back({base, color});
 			for (int i = 0; i < numSegments; ++i)

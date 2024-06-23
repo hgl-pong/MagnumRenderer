@@ -30,7 +30,7 @@ namespace MagnumRender
 		//GL::Renderer::enable(GL::Renderer::Feature::FaceCulling);
 
 		/* Grid */
-		m_GridMesh = std::make_unique<MagnumRender::GizmoRenderUnit>(MathLib::GraphicUtils::GenerateGrid3DWireFrameMeshData(MathLib::HVector2I( 150, 150 )));
+		m_GridMesh = std::make_unique<MagnumRender::GizmoRenderUnit>(MathLib::GraphicUtils::GenerateGrid3DWireFrameMeshData(MathLib::HVector2UI( 150, 150 )));
 		m_GridMesh->GetObject()
 			.scale(Vector3{ 800.0f });
 		m_GridMesh->AddToScene(m_RenderScene);

@@ -58,7 +58,7 @@ inline MathLib::HMatrix3 FromMagnum(const Magnum::Matrix3& mat) {
 	return matrix;
 }
 
-inline Magnum::Trade::MeshData CreateMesh(const MathLib::GraphicUtils::MeshData& meshdata)
+inline Magnum::Trade::MeshData CreateMesh(const MathLib::GraphicUtils::MeshData32& meshdata)
 {
 	const std::vector<MathLib::HVector3>& vertices = meshdata.m_Vertices;
 	const std::vector<uint32_t>& indices = meshdata.m_Indices;
